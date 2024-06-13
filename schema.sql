@@ -6,7 +6,9 @@
 DROP TABLE IF EXISTS User;
 CREATE TABLE User (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username VARCHAR NOT NULL
+  username VARCHAR NOT NULL,
+  password VARCHAR NOT NULL,
+  phone_number VARCHAR
 );
 
 -- ---
@@ -116,6 +118,21 @@ CREATE TABLE ExchangeRate (
 );
 
 -- ---
+-- Table 'SnapshotExchangeRate'
+-- ---
+DROP TABLE IF EXISTS SnapshotExchangeRate;
+CREATE TABLE SnapshotExchangeRate (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  userId INTEGER,
+  base_currency_id INTEGER NOT NULL,
+  quote_currency_id INTEGER NOT NULL,
+  commissionPercentage DECIMAL,
+  baseExchangeRateId INTEGER,
+  commissionFlat DOUBLE,
+  timestamp DATETIME
+);
+
+-- ---
 -- Table 'UserTransaction'
 -- ---
 DROP TABLE IF EXISTS UserTransaction;
@@ -125,7 +142,8 @@ CREATE TABLE UserTransaction (
   buyerUserId INTEGER NOT NULL,
   stageId INTEGER NOT NULL,
   markedCompletedUser1 BIT NOT NULL DEFAULT 0,
-  markedCompletedUser2 BIT NOT NULL DEFAULT 0
+  markedCompletedUser2 BIT NOT NULL DEFAULT 0,
+  SnapshotExchangeRateId INTEGER
 );
 
 -- ---
@@ -164,8 +182,8 @@ CREATE TABLE City (
 );
 
 -- Insert sample data (optional)
-INSERT INTO User (username) VALUES ('John Doe');
-INSERT INTO User (username) VALUES ('Mick Smith');
+INSERT INTO User (username, password, phone_number) VALUES ('John Doe', 'encryptedpassword1', '123-456-7890');
+INSERT INTO User (username, password, phone_number) VALUES ('Mick Smith', 'encryptedpassword2', '987-654-3210');
 
 INSERT INTO Country (id, name) VALUES (1, 'Vietnam');
 INSERT INTO Country (id, name) VALUES (2, 'USA');
@@ -192,9 +210,13 @@ INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (5, 'Proce
 INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (6, 'Seller Waiting', 'the seller is currently waiting for the other to arrive at the destination');
 INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (7, 'Buyer Waiting', 'the buyer is currently waiting for the other to arrive at the destination');
 INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (8, 'Completed', 'The transaction has been completed');
+INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (9, 'Cancelled', 'The transaction has been cancelled');
 
-INSERT INTO UserTransaction (id, sellerUserId, buyerUserId, stageId, markedCompletedUser1, markedCompletedUser2) VALUES (1, 1, 2, 4, 0, 0);
+INSERT INTO UserTransaction (id, sellerUserId, buyerUserId, stageId, markedCompletedUser1, markedCompletedUser2, SnapshotExchangeRateId) VALUES (1, 1, 2, 4, 0, 0, 1);
 
 INSERT INTO MeetingPoint (id, transactionId, longitude, lattitude, address, extraDescription, agreedTime, zipcode) VALUES (1, 1, 108.202040, 16.047079, '478 Điện Biên Phủ, Thanh Khê Đông, Thanh Khê, Đà Nẵng', 'KFC', '2024-06-29 01:00:00', '550000');
 
 INSERT INTO Rating (id, userId, rater_userid, score, description) VALUES (1, 2, 1, 100, 'fantastic, quick, charming, friendly');
+
+-- Insert snapshot exchange rate
+INSERT INTO SnapshotExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp) VALUES (1, 1, 1, 2, 5.1, 1, 0, CURRENT_TIMESTAMP);

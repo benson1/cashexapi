@@ -38,40 +38,48 @@ app.get('/', (req, res) => {
   });
 });
 
-// Define /exchanges route
+// Define the /exchanges route
 app.get('/exchanges', (req, res) => {
   const query = `
     SELECT 
-      Exchange.*,
-      City.name AS cityName,
-      User.username AS userName,
+      e.id,
+      e.longitude,
+      e.lattitude,
+      e.CityId,
+      e.ImageURL,
+      e.userId,
+      e.doDeliver,
+      e.address1,
+      e.address2,
+      e.address3,
+      e.address4,
+      e.zipcode,
+      c.name as cityName,
+      u.username as userName,
       (
         SELECT json_group_array(json_object(
-          'id', ExchangeRate.id,
-          'userId', ExchangeRate.userId,
-          'base_currency_id', ExchangeRate.base_currency_id,
-          'base_currency_name', baseCurrency.name,
-          'quote_currency_id', ExchangeRate.quote_currency_id,
-          'quote_currency_name', quoteCurrency.name,
-          'commissionPercentage', ExchangeRate.commissionPercentage,
-          'baseExchangeRateId', ExchangeRate.baseExchangeRateId,
-          'commissionFlat', ExchangeRate.commissionFlat,
-          'timestamp', ExchangeRate.timestamp,
-          'baseRateValue', printf("%.5f", BaseExchangeRate.value),
-          'baseRateName', BaseExchangeRate.name
+          'id', er.id,
+          'userId', er.userId,
+          'base_currency_id', er.base_currency_id,
+          'base_currency_name', bc.name,
+          'quote_currency_id', er.quote_currency_id,
+          'quote_currency_name', qc.name,
+          'commissionPercentage', er.commissionPercentage,
+          'baseExchangeRateId', er.baseExchangeRateId,
+          'commissionFlat', er.commissionFlat,
+          'timestamp', er.timestamp,
+          'baseRateValue', br.value,
+          'baseRateName', br.name
         ))
-        FROM ExchangeRate
-        JOIN BaseExchangeRate ON ExchangeRate.baseExchangeRateId = BaseExchangeRate.id
-        JOIN Currency baseCurrency ON ExchangeRate.base_currency_id = baseCurrency.id
-        JOIN Currency quoteCurrency ON ExchangeRate.quote_currency_id = quoteCurrency.id
-        WHERE ExchangeRate.userId = Exchange.userId
-      ) AS exchangeRates
-    FROM 
-      Exchange
-    JOIN 
-      City ON Exchange.CityId = City.id
-    JOIN 
-      User ON Exchange.userId = User.id
+        FROM ExchangeRate er
+        JOIN BaseExchangeRate br ON er.baseExchangeRateId = br.id
+        JOIN Currency bc ON er.base_currency_id = bc.id
+        JOIN Currency qc ON er.quote_currency_id = qc.id
+        WHERE er.userId = e.userId
+      ) as exchangeRates
+    FROM Exchange e
+    JOIN City c ON e.CityId = c.id
+    JOIN User u ON e.userId = u.id
   `;
 
   db.all(query, [], (err, rows) => {
@@ -79,11 +87,17 @@ app.get('/exchanges', (req, res) => {
       res.status(500).send(err.message);
       return;
     }
-    // Parse the JSON strings to remove backslashes
-    rows.forEach(row => {
-      row.exchangeRates = JSON.parse(row.exchangeRates);
+
+    // Parse the JSON string in exchangeRates to avoid double encoding
+    const formattedRows = rows.map(row => {
+      return {
+        ...row,
+        exchangeRates: JSON.parse(row.exchangeRates)
+      };
     });
-    res.json(rows);
+
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(formattedRows, null, 2));
   });
 });
 
