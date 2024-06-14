@@ -143,7 +143,9 @@ CREATE TABLE UserTransaction (
   stageId INTEGER NOT NULL,
   markedCompletedUser1 BIT NOT NULL DEFAULT 0,
   markedCompletedUser2 BIT NOT NULL DEFAULT 0,
-  SnapshotExchangeRateId INTEGER
+  SnapshotExchangeRateId INTEGER,
+  amountCncy1 DECIMAL,
+  amountCncy2 DECIMAL
 );
 
 -- ---
@@ -196,9 +198,13 @@ INSERT INTO Currency (id, name, countryId) VALUES (2, 'usd', 2);
 INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (1, 0.000039, 'VND to USD', 1, 2);
 INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (2, 25440.00, 'USD to VND', 2, 1);
 
-INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp) VALUES (1, 1, 1, 2, 5.1, 1, 0, CURRENT_TIMESTAMP);
+INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp) VALUES (1, 1, 1, 2, 2.2, 1, 0, CURRENT_TIMESTAMP);
+INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp) VALUES (2, 2, 1, 2, 1.8, 1, 0, CURRENT_TIMESTAMP);
+INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp) VALUES (3, 1, 2, 1, 3.1, 2, 0, CURRENT_TIMESTAMP);
+INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp) VALUES (4, 2, 2, 1, 2.8, 2, 0, CURRENT_TIMESTAMP);
 
-INSERT INTO Exchange (id, longitude, lattitude, CityId, ImageURL, userId, doDeliver, address1, address2, address3, address4, zipcode) VALUES (1, 108.1888586, 16.0549603, 1, 'https://cash.jp/images/logo.png', 1, 1, 'Đường Phần Lăng 14', 'Thanh Khê District', 'Đà Nẵng', 'Vietnam', '550000');
+INSERT INTO Exchange (id, longitude, lattitude, CityId, ImageURL, userId, doDeliver, address1, address2, address3, address4, zipcode) VALUES (1, 108.1888586, 16.0549603, 1, 'https://t4.ftcdn.net/jpg/04/77/58/01/240_F_477580156_wXUaajTfUOLwpWOOP3CuMGimx88DNFIv.jpg', 1, 1, 'Đường Phần Lăng 14', 'Thanh Khê District', 'Đà Nẵng', 'Vietnam', '550000');
+INSERT INTO Exchange (id, longitude, lattitude, CityId, ImageURL, userId, doDeliver, address1, address2, address3, address4, zipcode) VALUES (2, 108.22083, 16.06778, 1, 'https://cash.jp/images/logo.png', 2, 0, '121 Trần Phú', 'Hải Châu', 'Đà Nẵng', 'Vietnam', '550000');
 
 INSERT INTO Person (id, userId, ImageUrl, longitude, lattitude) VALUES (1, 2, 'https://www.pngitem.com/pimgs/m/87-879214_people-clipart-rich-man-the-broke-monopoly-man.png', 108.222060, 16.050850);
 
@@ -212,9 +218,9 @@ INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (7, 'Buyer
 INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (8, 'Completed', 'The transaction has been completed');
 INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (9, 'Cancelled', 'The transaction has been cancelled');
 
-INSERT INTO UserTransaction (id, sellerUserId, buyerUserId, stageId, markedCompletedUser1, markedCompletedUser2, SnapshotExchangeRateId) VALUES (1, 1, 2, 4, 0, 0, 1);
+INSERT INTO UserTransaction (id, sellerUserId, buyerUserId, stageId, markedCompletedUser1, markedCompletedUser2, SnapshotExchangeRateId, amountCncy1, amountCncy2) VALUES (1, 1, 2, 4, 0, 0, 1, 500.00, 20.00);
 
-INSERT INTO MeetingPoint (id, transactionId, longitude, lattitude, address, extraDescription, agreedTime, zipcode) VALUES (1, 1, 108.202040, 16.047079, '478 Điện Biên Phủ, Thanh Khê Đông, Thanh Khê, Đà Nẵng', 'KFC', '2024-06-29 01:00:00', '550000');
+INSERT INTO MeetingPoint(id, transactionId, longitude, lattitude, address, extraDescription, agreedTime, zipcode) VALUES (1, 1, 108.202040, 16.047079, '478 Điện Biên Phủ, Thanh Khê Đông, Thanh Khê, Đà Nẵng', 'KFC', '2024-06-29 01:00:00', '550000');
 
 INSERT INTO Rating (id, userId, rater_userid, score, description) VALUES (1, 2, 1, 100, 'fantastic, quick, charming, friendly');
 
