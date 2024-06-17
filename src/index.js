@@ -65,6 +65,8 @@ app.get('/exchanges', (req, res) => {
           'quote_currency_id', er.quote_currency_id,
           'quote_currency_name', qc.name,
           'commissionPercentage', er.commissionPercentage,
+          'deliveryCommissionPercentage', er.deliveryCommissionPercentage,
+          'deliveryCommissionFlat', er.deliveryCommissionFlat,
           'baseExchangeRateId', er.baseExchangeRateId,
           'commissionFlat', er.commissionFlat,
           'timestamp', er.timestamp,
