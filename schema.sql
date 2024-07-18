@@ -1,15 +1,18 @@
--- schema.sql
-
--- ---
--- Table 'User'
--- ---
+-- Modify User Table
 DROP TABLE IF EXISTS User;
 CREATE TABLE User (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username VARCHAR NOT NULL,
   password VARCHAR NOT NULL,
-  phone_number VARCHAR
+  phone_number VARCHAR,
+  email VARCHAR,
+  pref_currency_id INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Update existing user data to set pref_currency_id to 2
+UPDATE User SET pref_currency_id = 2 WHERE id IS NOT NULL;
 
 -- ---
 -- Table 'Exchange'
@@ -188,8 +191,8 @@ CREATE TABLE City (
 );
 
 -- Insert sample data (optional)
-INSERT INTO User (username, password, phone_number) VALUES ('John Doe', 'encryptedpassword1', '123-456-7890');
-INSERT INTO User (username, password, phone_number) VALUES ('Mick Smith', 'encryptedpassword2', '987-654-3210');
+INSERT INTO User (username, password, phone_number, email, pref_currency_id) VALUES ('John Doe', 'encryptedpassword1', '+447402963264', 'finnbenson99@gmail.com', 2);
+INSERT INTO User (username, password, phone_number, email, pref_currency_id) VALUES ('Mick Smith', 'encryptedpassword2', '987-654-3210', 'mick@example.com', 2);
 
 INSERT INTO Country (id, name) VALUES (1, 'Vietnam');
 INSERT INTO Country (id, name) VALUES (2, 'USA');
@@ -202,8 +205,8 @@ INSERT INTO Currency (id, name, countryId) VALUES (2, 'usd', 2);
 INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (1, 0.000039, 'VND to USD', 1, 2);
 INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (2, 25440.00, 'USD to VND', 2, 1);
 
-INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (1, 1, 1, 2, 2.2, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.0);
-INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (2, 2, 1, 2, 1.8, 1, 0, CURRENT_TIMESTAMP, 0, 0.0);
+INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (1, 1, 1, 2, 2.2, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
+INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (2, 2, 1, 2, 1.8, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
 INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (3, 1, 2, 1, 3.1, 2, 0, CURRENT_TIMESTAMP, 0, 0.0);
 INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (4, 2, 2, 1, 2.8, 2, 0, CURRENT_TIMESTAMP, 0, 0.0);
 
@@ -229,4 +232,4 @@ INSERT INTO MeetingPoint(id, transactionId, longitude, lattitude, address, extra
 INSERT INTO Rating (id, userId, rater_userid, score, description) VALUES (1, 2, 1, 100, 'fantastic, quick, charming, friendly');
 
 -- Insert snapshot exchange rate
-INSERT INTO SnapshotExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (1, 1, 1, 2, 5.1, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.0);
+INSERT INTO SnapshotExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (1, 1, 1, 2, 5.1, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);

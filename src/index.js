@@ -38,6 +38,27 @@ app.get('/', (req, res) => {
   });
 });
 
+// Define the /users route
+app.get('/users', (req, res) => {
+  const { userid } = req.query;
+
+  let query = 'SELECT * FROM User';
+  const params = [];
+
+  if (userid) {
+    query += ' WHERE id = ?';
+    params.push(userid);
+  }
+
+  db.all(query, params, (err, rows) => {
+    if (err) {
+      res.status(500).send(err.message);
+      return;
+    }
+    res.json(rows);
+  });
+});
+
 // Define the /exchanges route
 app.get('/exchanges', (req, res) => {
   const query = `
