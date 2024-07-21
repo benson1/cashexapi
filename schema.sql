@@ -10,11 +10,18 @@ CREATE TABLE User (
   is_verified_email BIT DEFAULT 0,  -- New field for email verification status
   verification_token VARCHAR,  -- Field to store verification token
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  language VARCHAR NOT NULL DEFAULT 'en', -- New field for language with default value 'en'
+  current_longitude DOUBLE, -- New field for current longitude
+  current_latitude DOUBLE, -- New field for current latitude
+  current_postcode VARCHAR(10), -- New field for current postcode (adjust length as needed)
+  current_address VARCHAR -- New field for current address (adjust size as needed)
 );
 
--- Update existing user data to set pref_currency_id to 2
-UPDATE User SET pref_currency_id = 2 WHERE id IS NOT NULL;
+-- Update existing user data to set pref_currency_id to 2 and populate new fields
+UPDATE User SET 
+  pref_currency_id = 2,
+  language = 'en';
 
 -- ---
 -- Table 'Exchange'
@@ -193,39 +200,47 @@ CREATE TABLE City (
 );
 
 -- Insert sample data (optional)
-INSERT INTO User (username, password, phone_number, email, pref_currency_id) VALUES ('John Doe', 'encryptedpassword1', '+447402963264', 'finnbenson99@gmail.com', 2);
-INSERT INTO User (username, password, phone_number, email, pref_currency_id) VALUES ('Mick Smith', 'encryptedpassword2', '987-654-3210', 'mick@example.com', 2);
+INSERT INTO User (username, password, phone_number, email, pref_currency_id, language) VALUES 
+('John Doe', 'encryptedpassword1', '+447402963264', 'finnbenson99@gmail.com', 2, 'en'),
+('Mick Smith', 'encryptedpassword2', '987-654-3210', 'mick@example.com', 2, 'en');
 
 INSERT INTO Country (id, name) VALUES (1, 'Vietnam');
 INSERT INTO Country (id, name) VALUES (2, 'USA');
+INSERT INTO Country (id, name) VALUES (3, 'Thailand');
 
 INSERT INTO City (id, name, countryId) VALUES (1, 'Da Nang', 1);
+INSERT INTO City (id, name, countryId) VALUES (2, 'Chiang Mai', 3);
 
 INSERT INTO Currency (id, name, countryId) VALUES (1, 'vnd', 1);
 INSERT INTO Currency (id, name, countryId) VALUES (2, 'usd', 2);
+INSERT INTO Currency (id, name, countryId) VALUES (3, 'thb', 3);
 
 INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (1, 0.000039, 'VND to USD', 1, 2);
 INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (2, 25440.00, 'USD to VND', 2, 1);
+INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (3, 36.36, 'USD to THB', 2, 3);
 
 INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (1, 1, 1, 2, 2.2, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
 INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (2, 2, 1, 2, 1.8, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
 INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (3, 1, 2, 1, 3.1, 2, 0, CURRENT_TIMESTAMP, 0, 0.0);
-INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (4, 2, 2, 1, 2.8, 2, 0, CURRENT_TIMESTAMP, 0, 0.0);
+INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (4, 1, 2, 3, 2.2, 3, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
 
-INSERT INTO Exchange (id, longitude, lattitude, CityId, ImageURL, userId, doDeliver, address1, address2, address3, address4, zipcode) VALUES (1, 108.1888586, 16.0549603, 1, 'https://t4.ftcdn.net/jpg/04/77/58/01/240_F_477580156_wXUaajTfUOLwpWOOP3CuMGimx88DNFIv.jpg', 1, 1, 'Đường Phần Lăng 14', 'Thanh Khê District', 'Đà Nẵng', 'Vietnam', '550000');
-INSERT INTO Exchange (id, longitude, lattitude, CityId, ImageURL, userId, doDeliver, address1, address2, address3, address4, zipcode) VALUES (2, 108.22083, 16.06778, 1, 'https://cash.jp/images/logo.png', 2, 0, '121 Trần Phú', 'Hải Châu', 'Đà Nẵng', 'Vietnam', '550000');
+INSERT INTO Exchange (id, longitude, lattitude, CityId, ImageURL, userId, doDeliver, address1, address2, address3, address4, zipcode) VALUES 
+(1, 108.1888586, 16.0549603, 1, 'https://t4.ftcdn.net/jpg/04/77/58/01/240_F_477580156_wXUaajTfUOLwpWOOP3CuMGimx88DNFIv.jpg', 1, 1, 'Đường Phần Lăng 14', 'Thanh Khê District', 'Đà Nẵng', 'Vietnam', '550000'),
+(2, 108.22083, 16.06778, 1, 'https://cash.jp/images/logo.png', 2, 0, '121 Trần Phú', 'Hải Châu', 'Đà Nẵng', 'Vietnam', '550000'),
+(3, 98.956000, 18.762580, 2, 'https://example.com/image.jpg', 1, 1, 'Address1', 'Address2', 'Address3', 'Address4', '550000');
 
 INSERT INTO Person (id, userId, ImageUrl, longitude, lattitude) VALUES (1, 2, 'https://www.pngitem.com/pimgs/m/87-879214_people-clipart-rich-man-the-broke-monopoly-man.png', 108.222060, 16.050850);
 
-INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (1, 'Preconceived', 'the trade action is not yet initiated or proposed by either party');
-INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (2, 'Proposed by buyer', 'the buyer has made a proposal to the seller');
-INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (3, 'Proposed by seller', 'the seller has made a counter proposal to the buyer');
-INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (4, 'Initiated', 'Agreed by both parties to fulfill transaction requirements');
-INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (5, 'Processing', 'The transaction has been agreed by both parties, but is taking considerable time to complete');
-INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (6, 'Seller Waiting', 'the seller is currently waiting for the other to arrive at the destination');
-INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (7, 'Buyer Waiting', 'the buyer is currently waiting for the other to arrive at the destination');
-INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (8, 'Completed', 'The transaction has been completed');
-INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (9, 'Cancelled', 'The transaction has been cancelled');
+INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES 
+(1, 'Preconceived', 'the trade action is not yet initiated or proposed by either party'),
+(2, 'Proposed by buyer', 'the buyer has made a proposal to the seller'),
+(3, 'Proposed by seller', 'the seller has made a counter proposal to the buyer'),
+(4, 'Initiated', 'Agreed by both parties to fulfill transaction requirements'),
+(5, 'Processing', 'The transaction has been agreed by both parties, but is taking considerable time to complete'),
+(6, 'Seller Waiting', 'the seller is currently waiting for the other to arrive at the destination'),
+(7, 'Buyer Waiting', 'the buyer is currently waiting for the other to arrive at the destination'),
+(8, 'Completed', 'The transaction has been completed'),
+(9, 'Cancelled', 'The transaction has been cancelled');
 
 INSERT INTO UserTransaction (id, sellerUserId, buyerUserId, stageId, markedCompletedUser1, markedCompletedUser2, SnapshotExchangeRateId, amountCncy1, amountCncy2) VALUES (1, 1, 2, 4, 0, 0, 1, 500.00, 20.00);
 
