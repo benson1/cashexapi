@@ -1,8 +1,10 @@
-require('dotenv').config();
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,6 +26,145 @@ db.serialize(() => {
     } else {
       console.log('Database initialized successfully');
     }
+  });
+});
+
+// Middleware for parsing JSON bodies
+app.use(express.json());
+
+// Create a Nodemailer transporter using Ethereal Email SMTP
+const transporter = nodemailer.createTransport({
+  host: 'smtp.ethereal.email',
+  port: 587,
+  auth: {
+    user: 'thad92@ethereal.email', // Your Ethereal Email username
+    pass: 'cDg5WGcA3MckuxGaxH'    // Your Ethereal Email password
+  }
+});
+
+// Function to send verification email
+function sendVerificationEmail(email, token) {
+  const verificationLink = `http://localhost:3000/verify?token=${token}`;
+
+  const mailOptions = {
+    from: 'thad92@ethereal.email', // Sender address
+    to: email,
+    subject: 'Verify Your Email Address',
+    html: `<p>Click <a href="${verificationLink}">here</a> to verify your email address.</p>`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Error sending email:', error);
+    } else {
+      console.log('Email sent:', info.response);
+      console.log('View the message at:', nodemailer.getTestMessageUrl(info));
+    }
+  });
+}
+
+// Define the /register route for user registration
+app.post('/register', async (req, res) => {
+  const { username, password, email, phoneNumber } = req.body;
+
+  try {
+    // Generate a verification token
+    const verificationToken = Math.random().toString(36).substring(7);
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert user details into the database
+    db.run(
+      'INSERT INTO User (username, password, email, phone_number, verification_token) VALUES (?, ?, ?, ?, ?)',
+      [username, hashedPassword, email, phoneNumber, verificationToken],
+      function (err) {
+        if (err) {
+          res.status(500).send(err.message);
+          return;
+        }
+
+        // Send verification email
+        sendVerificationEmail(email, verificationToken);
+
+        // Return the newly created user ID
+        res.json({ id: this.lastID });
+      }
+    );
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+// Define the /verify route for verifying email
+app.get('/verify', (req, res) => {
+  const { token } = req.query;
+
+  // Update user record in database to mark email as verified
+  db.run(
+    'UPDATE User SET is_verified_email = 1 WHERE verification_token = ?',
+    [token],
+    function (err) {
+      if (err) {
+        res.status(500).send(err.message);
+        return;
+      }
+
+      res.send('Email verified successfully');
+    }
+  );
+});
+
+// Define the /check-verification route to check if a user has verified their email
+app.get('/check-verification', (req, res) => {
+  const { userId } = req.query;
+
+  db.get(
+    'SELECT is_verified_email FROM User WHERE id = ?',
+    [userId],
+    (err, row) => {
+      if (err) {
+        res.status(500).send(err.message);
+        return;
+      }
+
+      if (!row) {
+        res.status(404).send('User not found');
+        return;
+      }
+
+      res.json({ isVerified: row.is_verified_email === 1 });
+    }
+  );
+});
+
+// Define the login endpoint
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  db.get('SELECT * FROM User WHERE username = ?', [username], async (err, user) => {
+    if (err) {
+      res.status(500).send(err.message);
+      return;
+    }
+
+    if (!user) {
+      res.status(404).send('User not found');
+      return;
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      res.status(401).send('Incorrect password');
+      return;
+    }
+
+    if (!user.is_verified_email) {
+      res.status(403).send('Email not verified');
+      return;
+    }
+
+    res.send('Login successful');
   });
 });
 

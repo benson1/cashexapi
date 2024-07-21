@@ -7,6 +7,8 @@ CREATE TABLE User (
   phone_number VARCHAR,
   email VARCHAR,
   pref_currency_id INTEGER,
+  is_verified_email BIT DEFAULT 0,  -- New field for email verification status
+  verification_token VARCHAR,  -- Field to store verification token
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
