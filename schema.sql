@@ -227,7 +227,7 @@ INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commi
 INSERT INTO Exchange (id, longitude, lattitude, CityId, ImageURL, userId, doDeliver, address1, address2, address3, address4, zipcode) VALUES 
 (1, 108.1888586, 16.0549603, 1, 'https://t4.ftcdn.net/jpg/04/77/58/01/240_F_477580156_wXUaajTfUOLwpWOOP3CuMGimx88DNFIv.jpg', 1, 1, 'Đường Phần Lăng 14', 'Thanh Khê District', 'Đà Nẵng', 'Vietnam', '550000'),
 (2, 108.22083, 16.06778, 1, 'https://cash.jp/images/logo.png', 2, 0, '121 Trần Phú', 'Hải Châu', 'Đà Nẵng', 'Vietnam', '550000'),
-(3, 98.956000, 18.762580, 2, 'https://example.com/image.jpg', 1, 1, 'Address1', 'Address2', 'Address3', 'Address4', '550000');
+(3, 98.99308013916016, 18.78816032409668, 2, 'https://example.com/image.jpg', 1, 1, 'Address1', 'Address2', 'Address3', 'Address4', '550000');
 
 INSERT INTO Person (id, userId, ImageUrl, longitude, lattitude) VALUES (1, 2, 'https://www.pngitem.com/pimgs/m/87-879214_people-clipart-rich-man-the-broke-monopoly-man.png', 108.222060, 16.050850);
 

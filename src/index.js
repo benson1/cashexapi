@@ -63,6 +63,18 @@ function sendVerificationEmail(email, token) {
   });
 }
 
+// Function to calculate distance between two coordinates in kilometers
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the Earth in kilometers
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    0.5 - Math.cos(dLat)/2 + 
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    (1 - Math.cos(dLon)) / 2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
+
 // Define the /register route for user registration
 app.post('/register', async (req, res) => {
   const { username, password, email, phoneNumber } = req.body;
@@ -202,7 +214,9 @@ app.get('/users', (req, res) => {
 
 // Define the /exchanges route
 app.get('/exchanges', (req, res) => {
-  const query = `
+  const { cityName, longitude, latitude, postcode } = req.query;
+
+  let query = `
     SELECT 
       e.id,
       e.longitude,
@@ -245,17 +259,52 @@ app.get('/exchanges', (req, res) => {
     JOIN City c ON e.CityId = c.id
     JOIN User u ON e.userId = u.id
   `;
+  
+  const params = [];
 
-  db.all(query, [], (err, rows) => {
+  if (cityName) {
+    query += ' WHERE c.name = ?';
+    params.push(cityName);
+  }
+
+  if (longitude && latitude) {
+    // Calculate distance in kilometers using the haversine formula
+    const radius = 6371; // Radius of the Earth in kilometers
+
+    query += cityName ? ' AND' : ' WHERE';
+    query += `
+      (
+        ${radius} * 
+        2 * 
+        ASIN(SQRT(
+          POWER(SIN((? - e.lattitude) * PI() / 180 / 2), 2) +
+          COS(e.lattitude * PI() / 180) *
+          COS(? * PI() / 180) *
+          POWER(SIN((? - e.longitude) * PI() / 180 / 2), 2)
+        ))
+      ) <= 5
+    `;
+    params.push(latitude, latitude, longitude);
+  }
+
+  if (postcode) {
+    query += (cityName || (longitude && latitude)) ? ' AND' : ' WHERE';
+    query += ' e.zipcode = ?';
+    params.push(postcode);
+  }
+
+  db.all(query, params, (err, rows) => {
     if (err) {
       res.status(500).send(err.message);
       return;
     }
 
-    // Parse the JSON string in exchangeRates to avoid double encoding
+    // Calculate distance and add to the response
     const formattedRows = rows.map(row => {
+      const distance = calculateDistance(latitude, longitude, row.lattitude, row.longitude);
       return {
         ...row,
+        distance: distance.toFixed(2), // Round to 2 decimal places
         exchangeRates: JSON.parse(row.exchangeRates)
       };
     });
