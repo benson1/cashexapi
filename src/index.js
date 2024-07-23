@@ -216,6 +216,7 @@ app.get('/users', (req, res) => {
 app.get('/exchanges', (req, res) => {
   const { cityName, longitude, latitude, postcode } = req.query;
 
+
   let query = `
     SELECT 
       e.id,
@@ -235,7 +236,7 @@ app.get('/exchanges', (req, res) => {
       (
         SELECT json_group_array(json_object(
           'id', er.id,
-          'userId', er.userId,
+          'exchangeId', er.exchangeId,
           'base_currency_id', er.base_currency_id,
           'base_currency_name', bc.name,
           'quote_currency_id', er.quote_currency_id,
@@ -253,13 +254,12 @@ app.get('/exchanges', (req, res) => {
         JOIN BaseExchangeRate br ON er.baseExchangeRateId = br.id
         JOIN Currency bc ON er.base_currency_id = bc.id
         JOIN Currency qc ON er.quote_currency_id = qc.id
-        WHERE er.userId = e.userId
+        WHERE er.exchangeId = e.id
       ) as exchangeRates
     FROM Exchange e
     JOIN City c ON e.CityId = c.id
     JOIN User u ON e.userId = u.id
   `;
-  
   const params = [];
 
   if (cityName) {

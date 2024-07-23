@@ -120,7 +120,7 @@ CREATE TABLE BaseExchangeRate (
 DROP TABLE IF EXISTS ExchangeRate;
 CREATE TABLE ExchangeRate (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  userId INTEGER,
+  exchangeId INTEGER,
   base_currency_id INTEGER NOT NULL,
   quote_currency_id INTEGER NOT NULL,
   commissionPercentage DECIMAL,
@@ -137,7 +137,7 @@ CREATE TABLE ExchangeRate (
 DROP TABLE IF EXISTS SnapshotExchangeRate;
 CREATE TABLE SnapshotExchangeRate (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  userId INTEGER,
+  exchangeId INTEGER,
   base_currency_id INTEGER NOT NULL,
   quote_currency_id INTEGER NOT NULL,
   commissionPercentage DECIMAL,
@@ -218,35 +218,36 @@ INSERT INTO Currency (id, name, countryId) VALUES (3, 'thb', 3);
 INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (1, 0.000039, 'VND to USD', 1, 2);
 INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (2, 25440.00, 'USD to VND', 2, 1);
 INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (3, 36.36, 'USD to THB', 2, 3);
-
-INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (1, 1, 1, 2, 2.2, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
-INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (2, 2, 1, 2, 1.8, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
-INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (3, 1, 2, 1, 3.1, 2, 0, CURRENT_TIMESTAMP, 0, 0.0);
-INSERT INTO ExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (4, 1, 2, 3, 2.2, 3, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
+INSERT INTO BaseExchangeRate (id, value, name, currency1, currency2) VALUES (4, 36.36, 'THB to USD', 3, 2);
 
 INSERT INTO Exchange (id, longitude, lattitude, CityId, ImageURL, userId, doDeliver, address1, address2, address3, address4, zipcode) VALUES 
 (1, 108.1888586, 16.0549603, 1, 'https://t4.ftcdn.net/jpg/04/77/58/01/240_F_477580156_wXUaajTfUOLwpWOOP3CuMGimx88DNFIv.jpg', 1, 1, 'Đường Phần Lăng 14', 'Thanh Khê District', 'Đà Nẵng', 'Vietnam', '550000'),
 (2, 108.22083, 16.06778, 1, 'https://cash.jp/images/logo.png', 2, 0, '121 Trần Phú', 'Hải Châu', 'Đà Nẵng', 'Vietnam', '550000'),
 (3, 98.99308013916016, 18.78816032409668, 2, 'https://example.com/image.jpg', 1, 1, 'Address1', 'Address2', 'Address3', 'Address4', '550000');
 
-INSERT INTO Person (id, userId, ImageUrl, longitude, lattitude) VALUES (1, 2, 'https://www.pngitem.com/pimgs/m/87-879214_people-clipart-rich-man-the-broke-monopoly-man.png', 108.222060, 16.050850);
+INSERT INTO ExchangeRate (id, exchangeId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (1, 1, 1, 2, 1.8, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
+INSERT INTO ExchangeRate (id, exchangeId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (5, 1, 2, 1, 1.8, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
+INSERT INTO ExchangeRate (id, exchangeId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (2, 2, 1, 2, 3.1, 2, 0, CURRENT_TIMESTAMP, 0, 0.0);
+INSERT INTO ExchangeRate (id, exchangeId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (6, 2, 2, 1, 3.1, 2, 0, CURRENT_TIMESTAMP, 0, 0.0);
+INSERT INTO ExchangeRate (id, exchangeId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (3, 3, 2, 3, 2.2, 3, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
+INSERT INTO ExchangeRate (id, exchangeId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (4, 3, 3, 2, 2.2, 4, 0, CURRENT_TIMESTAMP, 11.2, 0.5);
 
-INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES 
-(1, 'Preconceived', 'the trade action is not yet initiated or proposed by either party'),
-(2, 'Proposed by buyer', 'the buyer has made a proposal to the seller'),
-(3, 'Proposed by seller', 'the seller has made a counter proposal to the buyer'),
-(4, 'Initiated', 'Agreed by both parties to fulfill transaction requirements'),
-(5, 'Processing', 'The transaction has been agreed by both parties, but is taking considerable time to complete'),
-(6, 'Seller Waiting', 'the seller is currently waiting for the other to arrive at the destination'),
-(7, 'Buyer Waiting', 'the buyer is currently waiting for the other to arrive at the destination'),
-(8, 'Completed', 'The transaction has been completed'),
-(9, 'Cancelled', 'The transaction has been cancelled');
+INSERT INTO Person (id, userId, ImageUrl, longitude, lattitude) VALUES (1, 1, 'https://example.com/image1.jpg', 108.1888586, 16.0549603),
+(2, 2, 'https://example.com/image2.jpg', 108.22083, 16.06778);
 
-INSERT INTO UserTransaction (id, sellerUserId, buyerUserId, stageId, markedCompletedUser1, markedCompletedUser2, SnapshotExchangeRateId, amountCncy1, amountCncy2) VALUES (1, 1, 2, 4, 0, 0, 1, 500.00, 20.00);
+INSERT INTO SnapshotExchangeRate (id, exchangeId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (1, 1, 1, 2, 1.8, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
+INSERT INTO SnapshotExchangeRate (id, exchangeId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (2, 2, 2, 1, 3.1, 2, 0, CURRENT_TIMESTAMP, 0, 0.0);
+INSERT INTO SnapshotExchangeRate (id, exchangeId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (3, 3, 2, 3, 2.2, 3, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
+INSERT INTO SnapshotExchangeRate (id, exchangeId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (4, 3, 3, 2, 2.2, 4, 0, CURRENT_TIMESTAMP, 11.2, 0.5);
 
-INSERT INTO MeetingPoint(id, transactionId, longitude, lattitude, address, extraDescription, agreedTime, zipcode) VALUES (1, 1, 108.202040, 16.047079, '478 Điện Biên Phủ, Thanh Khê Đông, Thanh Khê, Đà Nẵng', 'KFC', '2024-06-29 01:00:00', '550000');
+INSERT INTO UserTransaction (id, sellerUserId, buyerUserId, stageId, markedCompletedUser1, markedCompletedUser2, SnapshotExchangeRateId, amountCncy1, amountCncy2) VALUES (1, 1, 2, 1, 0, 0, 1, 1000000, 40),
+(2, 2, 1, 1, 0, 0, 2, 40, 1000000);
 
-INSERT INTO Rating (id, userId, rater_userid, score, description) VALUES (1, 2, 1, 100, 'fantastic, quick, charming, friendly');
+INSERT INTO StageTransaction (id, StageName, StageDescription) VALUES (1, 'Initiated', 'Transaction initiated by user'),
+(2, 'Completed', 'Transaction completed successfully');
 
--- Insert snapshot exchange rate
-INSERT INTO SnapshotExchangeRate (id, userId, base_currency_id, quote_currency_id, commissionPercentage, baseExchangeRateId, commissionFlat, timestamp, deliveryCommissionPercentage, deliveryCommissionFlat) VALUES (1, 1, 1, 2, 5.1, 1, 0, CURRENT_TIMESTAMP, 10.2, 0.5);
+INSERT INTO MeetingPoint (id, transactionId, longitude, lattitude, address, extraDescription, agreedTime, zipcode) VALUES (1, 1, 108.1888586, 16.0549603, 'Đường Phần Lăng 14', 'Near the park', '2024-07-20 14:00:00', '550000'),
+(2, 2, 108.22083, 16.06778, '121 Trần Phú', 'In front of the coffee shop', '2024-07-21 16:00:00', '550000');
+
+INSERT INTO City (id, name, countryId) VALUES (3, 'Bangkok', 3),
+(4, 'New York', 2);
