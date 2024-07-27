@@ -208,7 +208,7 @@ INSERT INTO Country (id, name) VALUES (1, 'Vietnam');
 INSERT INTO Country (id, name) VALUES (2, 'USA');
 INSERT INTO Country (id, name) VALUES (3, 'Thailand');
 
-INSERT INTO City (id, name, countryId) VALUES (1, 'Da Nang', 1);
+INSERT INTO City (id, name, countryId) VALUES (1, 'Da Nang', 3);
 INSERT INTO City (id, name, countryId) VALUES (2, 'Chiang Mai', 3);
 
 INSERT INTO Currency (id, name, countryId) VALUES (1, 'vnd', 1);
@@ -250,4 +250,4 @@ INSERT INTO MeetingPoint (id, transactionId, longitude, lattitude, address, extr
 (2, 2, 108.22083, 16.06778, '121 Trần Phú', 'In front of the coffee shop', '2024-07-21 16:00:00', '550000');
 
 INSERT INTO City (id, name, countryId) VALUES (3, 'Bangkok', 3),
-(4, 'New York', 2);
+(4, 'New York', 2)
